@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id      Int      @id @default(autoincrement())
+  title   String
+  content String
+  tags    String[]
+  userId  Int
+  User    User     @relation(fields: [userId], references: [id])
+}
+
+model Company {
+  id       Int    @id @default(autoincrement())
+  name     String
+  logo     String
+  jobtitle String
+  userId   Int
+  User     User   @relation(fields: [userId], references: [id])
+}
+
+model AboutMe {
+  id      Int     @id @default(autoincrement())
+  para1   String
+  para2   String
+  links   Json
+  userId  Int     @unique
+  User    User    @relation(fields: [userId], references: [id])
+}
+
+model Skill {
+  id      Int    @id @default(autoincrement())
+  name    String
+  userId  Int
+  User    User   @relation(fields: [userId], references: [id])
+}
+
+model Education {
+  id      Int    @id @default(autoincrement())
+  detail  String
+  userId  Int
+  User    User   @relation(fields: [userId], references: [id])
+}
+
+model Interest {
+  id      Int    @id @default(autoincrement())
+  name    String
+  userId  Int
+  User    User   @relation(fields: [userId], references: [id])
+}
+
+model WhyShouldHireYou {
+  id      Int    @id @default(autoincrement())
+  reason  String
+  userId  Int    @unique
+  User    User   @relation(fields: [userId], references: [id]) 
+}
+
+model User {
+  id                 Int              @id @default(autoincrement())
+  email              String           @unique
+  password           String           @unique       
+  aboutMe            AboutMe?           
+  whyShouldHireYou   WhyShouldHireYou?  
+  projects           Project[]
+  company            Company[]
+  skills             Skill[]
+  education          Education[]
+  interest           Interest[]
+}

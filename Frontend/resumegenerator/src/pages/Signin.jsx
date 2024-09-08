@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
+import { useUser } from '../Context/context.jsx';
 export default function SignIn() {
   const [email, setEmail] = useState('');
+  const {user,setUser}=useUser()
+
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
@@ -14,11 +16,12 @@ export default function SignIn() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
       alert(data.message);
 
-      if (response.ok) {
+      if (response.status==200) {
+        setUser({ id:data.user })
+        localStorage.setItem("id",`${data.user}`);
         navigate("/form");
       }
     } catch (error) {

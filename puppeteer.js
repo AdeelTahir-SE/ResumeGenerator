@@ -3,7 +3,7 @@ export  async function webPagetopdf(url,outputfilepath){
  // Launch a headless browser
  const browser = await puppeteer.launch();
   
- // Open a new page
+ // Open a new pag
  const page = await browser.newPage();
 
  // Navigate to the specified URL
@@ -17,8 +17,7 @@ export  async function webPagetopdf(url,outputfilepath){
    landscape:false
  });}
  
-
- // Close the browser
+ 
  await browser.close();
 }
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
+import { useUser } from '../Context/context.jsx';
 export default function CreateAccount() {
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const {user,setUser}=useUser();
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
@@ -14,13 +14,16 @@ export default function CreateAccount() {
       const response = await fetch("http://localhost:3000/api/user/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({  email, password }),
       });
-
       const data = await response.json();
+
+setUser({id:dataUser.user})
+localStorage.setItem("id",`${data.user}`);
+
       alert(data.message);
 
-      if (response.ok) {
+      if (response.status==201) {
         navigate("/form");
       }
     } catch (error) {
@@ -34,18 +37,7 @@ export default function CreateAccount() {
         <div className="p-6">
           <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Create Account</h2>
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-              <input
-                type="text"
-                id="name"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full mt-2 p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-              />
-            </div>
+           
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
               <input

@@ -2,26 +2,51 @@ import {Router} from "express"
 import { createResume,createUser,getResume,loginuser } from "./prismaclient.js";
 import {webPagetopdf,webPagetojpeg} from "./puppeteer.js";
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-
+import prisma from "./prismaclient.js";
 const router = Router();
-router.post("/resumedata/:email", async (req, res) => {
+router.get("/resumedata/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+
+    const resume = await getResume(parseInt(id,10));
+    if (resume) {
+      res.status(200).json(resume);
+    } else {
+      res.status(404).json({ message: 'Resume not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the resume.' });
+  }
+});
+
+router.post("/resumedata", async (req, res) => {
 
   const {
+    id,
     aboutMeData,
     whyShouldHireYou,
-    password,
+    projects,
+    skills,
+    company,
+    profileImage,
+    education,
+    interests,
+  } = req.body;
+  console.log('Received data:', {
+    id,
+    aboutMeData,
+    whyShouldHireYou,
     projects,
     skills,
     company,
     education,
-    email,
-    interests,
-  } = req.body;
- 
+    interests
+  });
   try {
     const resume = await createResume(
-      email,
-      password,
+      parseInt(id),
+      profileImage,
       aboutMeData,
       whyShouldHireYou,
       projects,
@@ -43,15 +68,15 @@ router.post("/resumedata/:email", async (req, res) => {
 
 
 
-router.get("/resumedata/:email",(req,res)=>{
-    const {email}=req.params;
-res.json(getResume(email))
-});
+
 
 router.get("/templates/images",async (req,res)=>{
-for(let i=1;i<5;i++)
+for(let i=1;i<5;i++){
   await webPagetojpeg(`http://localhost:5173/Template${i}`,`Frontend/resumegenerator/src/assets/outputresume${i}.jpeg`)
-})
+}
+res.json({message:"created successfully!"})
+}
+)
 
 
 router.get("/templates/pdf/:id",async(req,res)=>{
@@ -60,8 +85,6 @@ const{id}=req.params;
   res.json({msg:"success"})
 })
 
-
-// Backend route for creating a user
 router.post("/user/create", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -71,9 +94,10 @@ router.post("/user/create", async (req, res) => {
       return res.status(400).json({ message: 'A user with this email already exists' });
     }
 
-    const response = await createUser(name, email, password);
+    // Create user
+    const response = await createUser( email, password);
     if (response) {
-      res.status(201).json({ message: 'User created successfully' });
+      res.status(201).json({ user:response.id,message:"User created successfully!" });
     } else {
       res.status(400).json({ message: 'Failed to create user' });
     }
@@ -81,11 +105,12 @@ router.post("/user/create", async (req, res) => {
     if (error instanceof PrismaClientKnownRequestError) {
       res.status(400).json({ message: `Prisma Client Error: ${error.message}` });
     } else {
-      res.status(500).json({ message: `Server error: ${error}` });
+      res.status(500).json({ message: `Server error: ${error.message}` });
     }
   }
 });
 
+// Backend route for user login
 router.post("/user/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -96,12 +121,12 @@ router.post("/user/login", async (req, res) => {
     }
 
     // Validate password
-    const isPasswordValid = await validatePassword(password, user.password); // Replace with your password validation function
+    const isPasswordValid = await loginuser(email, password); // Replace with your password validation function
     if (!isPasswordValid) {
       return res.status(400).json({ message: 'Incorrect password' });
     }
-
-    res.status(200).json({ message: 'Login successful' });
+console.log(isPasswordValid.id)
+    res.status(200).json({ user: isPasswordValid.id,message:"login successfully!" });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       res.status(400).json({ message: `Prisma Client Error: ${error.message}` });

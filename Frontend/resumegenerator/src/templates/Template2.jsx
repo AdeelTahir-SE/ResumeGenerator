@@ -1,100 +1,41 @@
 import React from "react";
-import company from "../assets/company.png";
-import profile from "../assets/profile.png";
 import Bgsvg from "../components/bgsvg";
 import ReactDOMServer from "react-dom/server";
 import { useState, useEffect } from "react";
 import "./Template.css"; // Import your CSS file
+import { useUser } from '../Context/context.jsx'; // Adjust the path as needed
 
 function Template2() {
+  const { user } = useUser();
+  const [data, setData] = useState([]);
+  const [companydata, setCompanyData] = useState({});
+  const [aboutMe, setAboutMe] = useState({});
+  const [education, setEducation] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [interests, setInterests] = useState([]);
+  const [image,setImage]=useState();
+
+  const [whyShouldHireYou, setWhyShouldHireYou] = useState({});
   useEffect(() => {
-    // Simulate fetching data
-    Object.keys(aboutMe.links);
-  }, []);
 
-  const [data, setData] = useState([
-    {
-      title: "Weather App",
-      content: "A weather application frontend built with React, utilizing an API to fetch weather data.",
-      tags: ["React", "API", "Node.js", "Express.js", "Redis"],
-    },
-    {
-      title: "GitHub API CLI",
-      content: "A command-line interface application for interacting with GitHub's API, created using Node.js.",
-      tags: ["Node.js", "GitHub API", "Express.js"],
-    },
-    {
-      title: "Task Tracker CLI",
-      content: "A command-line tool for managing tasks, built with Node.js and CLI libraries.",
-      tags: ["Node.js", "CLI", "Express.js"],
-    },
-    {
-      title: "Restaurant App",
-      content: "A web application for managing restaurant orders and menu, developed with React and backend technologies.",
-      tags: ["React", "Backend", "Express.js", "Node.js"],
-    },
-    {
-      title: "Blogging App and API",
-      content: "A blogging platform with a custom API, built with React for the frontend and Node.js for the backend.",
-      tags: ["React", "Node.js", "API", "Express.js", "Prisma"],
-    },
-    {
-      title: "Resume Generator",
-      content: "A tool for generating resumes, designed with a user-friendly interface and export functionality.",
-      tags: ["Export Functionality", "Express.js", "Node.js", "React"],
-    },
-  ]);
-
-  const [companydata, setCompanyData] = useState({
-    name: "SewingCircle",
-    logo: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Ffree-vector%2Fcompany-logo-design_1155791.htm&psig=AOvVaw3p1XwVW4zZ2k7x2D7V9y7U&ust=1633666229833000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCJjYjJXJ0fMCFQAAAAAdAAAAABAD",
-    jobtitle: "Full Stack Developer",
-  });
-
-  const [aboutMe, setAboutMe] = useState({
-    para1: "Hello! I’m a passionate student at NUST who has rapidly acquired a strong skill set in full stack development in less than a year. My love for knowledge has driven me to master a variety of technologies, including React, Node.js, and various databases. This swift learning curve reflects my dedication to continuous growth and problem-solving.",
-    para2: "I thrive in environments where I can leverage my skills and enthusiasm to contribute to meaningful projects. My journey in tech is characterized by a commitment to learning and adapting, which fuels my ability to tackle new challenges and stay ahead in the ever-evolving field of technology.",
-    links: {
-      link1: ["GitHub Link:", "https://github.com/AdeelTahir-SE"],
-      link2: ["LinkedIn Link:", "https://www.linkedin.com/in/adeel-tahir-41ba212b9/"],
-      link3: ["Email:", "adeeltahir6a@gmail.com"]
+    async function fetchResumeData(id) {
+      const response = await fetch(`http://localhost:3000/api/resumedata/${id}`);
+      const resumedata = await response.json();
+      setImage(resumedata.profile)
+      setData(resumedata.projects);
+      setAboutMe(resumedata.aboutMe);
+      setCompanyData(resumedata.company[0]);
+      setEducation(resumedata.education);
+      setSkills(resumedata.skills);
+      setInterests(resumedata.interest);
+      setWhyShouldHireYou(resumedata.whyShouldHireYou);
     }
-  });
-
-  const [skills, setSkills] = useState([
-    "CSS",
-    "MongoDB",
-    "tailwindcss",
-    "Next.js",
-    "Node.js",
-    "PostgreSQL",
-    "Prisma",
-    "React",
-    "JavaScript",
-    "HTML",
-    "Express.js",
-    "REST APIs",
-    "Redis",
-    "API Integration",
-  ]);
-
-  const [education, setEducation] = useState([
-    "Student at NUST",
-    "Self-taught in Full Stack Development in less than a year",
-    "Enthusiastic about Continuous Learning and Growth",
-    "Passionate about Exploring New Technologies",
-  ]);
-
-  const [interests, setInterests] = useState([
-    "Exploring New Technologies",
-    "Traveling and Learning About Different Cultures",
-    "Playing and Analyzing Strategy Games",
-    "Participating in Coding Competitions",
-  ]);
-
-  const [whyShouldHireYou, setWhyShouldHireYou] = useState(
-    "I am a highly motivated Full Stack Developer with a strong foundation in both front-end and back-end technologies. My experience with React, Node.js, and various databases equips me to tackle complex problems and deliver robust solutions. My rapid learning ability and enthusiasm for technology make me a valuable asset for any team."
-  );
+    if(user&&user.id){
+      fetchResumeData(user.id); // Fetch with default ID first
+      }
+      else{
+        fetchResumeData(localStorage.getItem("id"));
+      }  }, []);
   const svgColor = getComputedStyle(document.documentElement).getPropertyValue('--svgcolor').trim();
 
   const svgElement = <Bgsvg color={svgColor} />;
@@ -115,7 +56,7 @@ function Template2() {
         {/* Upper section with profile, title, and company logo */}
         <div className="upper flex flex-col items-center justify-center w-full mb-2 p-1 rounded-xl shadow-lg" style={{ background: "var(--primary-color)" }}>
           <img
-            src={profile}
+            src={image}
             alt="Profile"
             className="w-16 h-auto rounded-full border-2 border-white shadow-md"
           />
@@ -123,7 +64,7 @@ function Template2() {
             Applying for {companydata.jobtitle} at {companydata.name}
           </h2>
           <img
-            src={company}
+            src={companydata.logo}
             alt="Company Logo"
             className="w-16 h-auto mt-1"
           />
@@ -142,7 +83,7 @@ function Template2() {
                     key={i}
                     className="mb-1 transition-transform transform hover:scale-95"
                   >
-                    {skill}
+                    {skill.name}
                   </li>
                 ))
               ) : (
@@ -192,9 +133,9 @@ function Template2() {
             <p className="text-xs" style={{ color: "var(--text-color)" }}>{aboutMe.para1}</p>
             <p className="text-xs mt-1" style={{ color: "var(--text-color)" }}>{aboutMe.para2}</p>
             <ul className="text-xs mt-1 list-disc list-inside" style={{ color: "var(--text-color)" }}>
-              {Object.entries(aboutMe.links).map(([key, [label, link]], i) => (
+              {aboutMe.links&&aboutMe.links.map((value, i) => (
                 <li key={i} className="mb-1">
-                  {label} <a href={link} className="text-blue-600">{link}</a>
+{value}
                 </li>
               ))}
             </ul>
@@ -208,7 +149,7 @@ function Template2() {
             <ul className="text-xs list-disc list-inside">
               {education.map((item, i) => (
                 <li key={i} className="mb-1">
-                  {item}
+                  {item.detail}
                 </li>
               ))}
             </ul>
@@ -216,7 +157,7 @@ function Template2() {
             <ul className="text-xs list-disc list-inside mt-1">
               {interests.map((item, i) => (
                 <li key={i} className="mb-1">
-                  {item}
+                  {item.name}
                 </li>
               ))}
             </ul>
@@ -228,7 +169,7 @@ function Template2() {
           <h3 className="text-sm mb-1 font-bold" style={{ color: "var(--primary-color)", borderBottom: "2px solid var(--primary-light)" }}>
             Why Should You Hire Me?
           </h3>
-          <p className="text-xs" style={{ color: "var(--text-color)" }}>{whyShouldHireYou}</p>
+          <p className="text-xs" style={{ color: "var(--text-color)" }}>{whyShouldHireYou.reason}</p>
         </div>
       </div>
     </>

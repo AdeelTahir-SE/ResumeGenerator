@@ -5,6 +5,7 @@ import Template1 from './templates/Template1.jsx'
 import Template2 from"./templates/Template2.jsx"
 import Template3 from './templates/Template3.jsx'
 import Template4 from './templates/Template4.jsx'
+import { UserProvider } from './Context/context.jsx'
 import Form from './pages/form.jsx'
 import './index.css'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
@@ -52,6 +53,9 @@ const router =createBrowserRouter([
 ])
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+        <UserProvider>
     <RouterProvider router={router}/>
+    </UserProvider>
+
   </StrictMode>,
 )

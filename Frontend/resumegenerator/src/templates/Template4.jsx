@@ -4,108 +4,41 @@ import profile from "../assets/profile.png";
 import Bgsvg from "../components/bgsvg";
 import ReactDOMServer from "react-dom/server";
 import { useState, useEffect } from "react";
+import { useUser } from '../Context/context.jsx'; // Adjust the path as needed
 
 function Template4() {
+  const { user,setUser } = useUser();
+  const [data, setData] = useState([]);
+  const [companydata, setCompanyData] = useState({});
+  const [aboutMe, setAboutMe] = useState({});
+  const [education, setEducation] = useState([]);
+  const [image,setImage]=useState();
+
+  const [skills, setSkills] = useState([]);
+  const [interests, setInterests] = useState([]);
+  const [whyShouldHireYou, setWhyShouldHireYou] = useState({});
   useEffect(() => {
-    // Example of data fetch (not used in this static example)
-    // async function fetchResumeData(email) {
-    //   const response = await fetch(`http://localhost:3000/resumedata/${email}`);
-    //   const resumedata = await response.json();
-    //   setData(resumedata.data);
-    //   setAboutMe(resumedata.aboutMe);
-    //   setCompanyData(resumedata.companyData);
-    //   setEducation(resumedata.education);
-    //   setSkills(resumedata.skills);
-    //   setInterests(resumedata.interests);
-    //   setWhyShouldHireYou(resumedata.whyShouldHireYou);
-    // }
-    // fetchResumeData(email);
-  }, []);
 
-  const [data, setData] = useState([
-    {
-      title: "Weather App",
-      content: "A weather application frontend built with React, utilizing an API to fetch weather data.",
-      tags: ["React", "API", "Node.js", "Express.js", "Redis"],
-    },
-    {
-      title: "GitHub API CLI",
-      content: "A command-line interface application for interacting with GitHub's API, created using Node.js.",
-      tags: ["Node.js", "GitHub API", "Express.js"],
-    },
-    {
-      title: "Task Tracker CLI",
-      content: "A command-line tool for managing tasks, built with Node.js and CLI libraries.",
-      tags: ["Node.js", "CLI", "Express.js"],
-    },
-    {
-      title: "Restaurant App",
-      content: "A web application for managing restaurant orders and menu, developed with React and backend technologies.",
-      tags: ["React", "Backend", "Express.js", "Node.js"],
-    },
-    {
-      title: "Blogging App and API",
-      content: "A blogging platform with a custom API, built with React for the frontend and Node.js for the backend.",
-      tags: ["React", "Node.js", "API", "Express.js", "Prisma"],
-    },
-    {
-      title: "Resume Generator",
-      content: "A tool for generating resumes, designed with a user-friendly interface and export functionality.",
-      tags: ["Export Functionality", "Express.js", "Node.js", "React"],
-    },
-  ]);
+    async function fetchResumeData(id) {
+      const response = await fetch(`http://localhost:3000/api/resumedata/${id}`);
+      const resumedata = await response.json();
+      setImage(resumedata.profile)
+      setData(resumedata.projects);
+      setAboutMe(resumedata.aboutMe);
+      setCompanyData(resumedata.company[0]);
+      setEducation(resumedata.education);
+      setSkills(resumedata.skills);
+      setInterests(resumedata.interest);
+      setWhyShouldHireYou(resumedata.whyShouldHireYou);
+    }
+    if(user&&user.id){
+      fetchResumeData(user.id); // Fetch with default ID first
+      }
+      else{
+        fetchResumeData(localStorage.getItem("id"));
+      }  }, []);
 
-  const [companydata, setCompanyData] = useState({
-    name: "TechFusion",
-    logo: "https://www.example.com/logo3.png",
-    jobtitle: "Senior Software Engineer",
-  });
-
-  const [aboutMe, setAboutMe] = useState({
-    para1: "I’m a highly skilled Full Stack Developer with extensive experience in building scalable web applications. My technical expertise spans both frontend and backend technologies, allowing me to deliver complete solutions with a focus on performance and user experience.",
-    para2: "My passion for technology drives me to continuously learn and adapt to new challenges. I excel in collaborative environments and am committed to delivering high-quality results in all my projects.",
-    links: {
-      link1: ["GitHub:", "https://github.com/AdeelTahir-SE"],
-      link2: ["LinkedIn:", "https://www.linkedin.com/in/adeel-tahir-41ba212b9/"],
-      link3: ["Email:", "adeeltahir6a@gmail.com"],
-    },
-  });
-
-  const [skills, setSkills] = useState([
-    "CSS",
-    "MongoDB",
-    "Tailwind CSS",
-    "Next.js",
-    "Node.js",
-    "PostgreSQL",
-    "Prisma",
-    "React",
-    "JavaScript",
-    "HTML",
-    "Express.js",
-    "REST APIs",
-    "Redis",
-    "API Integration",
-  ]);
-
-  const [education, setEducation] = useState([
-    "Student at NUST",
-    "Self-taught in Full Stack Development",
-    "Dedicated to Continuous Learning",
-    "Passionate about Exploring New Technologies",
-  ]);
-
-  const [interests, setInterests] = useState([
-    "Exploring New Technologies",
-    "Traveling and Learning About Different Cultures",
-    "Playing and Analyzing Strategy Games",
-    "Participating in Coding Competitions",
-  ]);
-
-  const [whyShouldHireYou, setWhyShouldHireYou] = useState(
-    "I bring a strong combination of technical skills and a proactive approach to problem-solving. My background in full stack development, along with my commitment to continuous improvement, makes me a valuable addition to any team. I am driven to deliver impactful solutions and thrive in dynamic environments."
-  );
-
+ 
   const svgElement = <Bgsvg color="#34d399" />; // Green color for a fresh look
   const svgString = ReactDOMServer.renderToStaticMarkup(svgElement);
   const svgDataURL = `data:image/svg+xml;base64,${window.btoa(svgString)}`;
@@ -127,14 +60,14 @@ function Template4() {
         <aside className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white w-full md:w-1/4 p-4">
           <div className="flex flex-col items-center">
             <img
-              src={profile}
+              src={image}
               alt="Profile"
               className="w-24 h-24 rounded-full border-2 border-white shadow-md mb-2"
             />
             <h2 className="text-lg font-semibold mb-1">{companydata.name}</h2>
             <h3 className="text-sm mb-2">{companydata.jobtitle}</h3>
             <img
-              src={company}
+              src={companydata.logo}
               alt="Company Logo"
               className="w-16 h-auto mb-2"
             />
@@ -142,15 +75,15 @@ function Template4() {
 
           <div className="mt-4">
             <h4 className="text-sm font-semibold mb-1">Contact</h4>
-            {Object.entries(aboutMe.links).map(([key, [label, url]], index) => (
+            {aboutMe.links&&aboutMe.links.map((value, index) => (
               <p key={index} className="text-xs mb-1">
-                <a href={url} target="_blank" rel="noopener noreferrer" className="text-teal-300 hover:underline">{label} {url}</a>
+{value}
               </p>
             ))}
           </div>
           <section className="bg-white p-3 mt-2 rounded-lg shadow-sm">
             <h3 className="text-sm font-semibold text-gray-900 mb-2">Why Should Hire You</h3>
-            <p className="text-gray-700 text-xs">{whyShouldHireYou}</p>
+            <p className="text-gray-700 text-xs">{whyShouldHireYou.reason}</p>
           </section>
         </aside>
 
@@ -171,7 +104,7 @@ function Template4() {
               <ul className="list-disc list-inside text-xs">
                 {skills.length > 0 ? (
                   skills.map((skill, index) => (
-                    <li key={index} className="mb-1">{skill}</li>
+                    <li key={index} className="mb-1">{skill.name}</li>
                   ))
                 ) : (
                   <li>No skills listed.</li>
@@ -215,7 +148,7 @@ function Template4() {
               <ul className="list-disc list-inside text-xs">
                 {education.length > 0 ? (
                   education.map((item, index) => (
-                    <li key={index} className="mb-1">{item}</li>
+                    <li key={index} className="mb-1">{item.detail}</li>
                   ))
                 ) : (
                   <li>No education information available.</li>
@@ -229,7 +162,7 @@ function Template4() {
               <ul className="list-disc list-inside text-xs">
                 {interests.length > 0 ? (
                   interests.map((interest, index) => (
-                    <li key={index} className="mb-1">{interest}</li>
+                    <li key={index} className="mb-1">{interest.name}</li>
                   ))
                 ) : (
                   <li>No interests listed.</li>

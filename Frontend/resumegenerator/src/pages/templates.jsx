@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import output1 from "../assets/output1.jpeg";
-import output2 from "../assets/output2.jpeg";
-import output3 from "../assets/output3.jpeg";
-import output4 from "../assets/output4.jpeg";
+import output1 from "../assets/outputresume1.jpeg";
+import output2 from "../assets/outputresume2.jpeg";
+import output3 from "../assets/outputresume3.jpeg";
+import output4 from "../assets/outputresume4.jpeg";
 import Bgsvg from "../components/bgsvg";
 import ReactDOMServer from "react-dom/server";
 export default function Templates() {
